@@ -20,18 +20,18 @@ class BostonVisualizer:
     def plot_missing_data(self, save_path: Optional[str] = None, figsize: tuple = (12, 6)) -> None:
         """Eksik verileri interaktif heatmap ve çubuk grafikle gösterir."""
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=figsize)
-        
+
         # Heatmap
         sns.heatmap(self.df.isnull(), cbar=False, cmap='magma', ax=ax1)
         ax1.set_title("Eksik Veri Heatmap", pad=20)
-        
+
         # Çubuk Grafik
         missing = self.df.isnull().sum().sort_values(ascending=False)
         missing = missing[missing > 0]
         sns.barplot(x=missing.values, y=missing.index, ax=ax2, palette="rocket")
         ax2.set_title("Eksik Veri Sayısı", pad=20)
         ax2.set_xlabel("Eksik Kayıt Sayısı")
-        
+
         plt.tight_layout()
         self._save_plot(fig, save_path)
 
@@ -41,13 +41,13 @@ class BostonVisualizer:
         """Dinamik thresholdlu korelasyon matrisi"""
         corr = self.df.corr(numeric_only=True)
         mask = np.triu(np.ones_like(corr, dtype=bool))
-        
+
         plt.figure(figsize=(14, 10))
         heatmap = sns.heatmap(
-            corr, 
-            mask=mask, 
-            annot=True, 
-            fmt=".2f", 
+            corr,
+            mask=mask,
+            annot=True,
+            fmt=".2f",
             cmap="coolwarm",
             annot_kws=annot_kws,
             vmin=-1, vmax=1,
@@ -64,15 +64,15 @@ class BostonVisualizer:
             1, 2, figsize=(14, 6),
             gridspec_kw={'width_ratios': [3, 1]}
         )
-        
+
         # Histogram + KDE
         sns.histplot(
-            data=self.df, x=column, hue=hue, 
+            data=self.df, x=column, hue=hue,
             kde=kde, ax=ax1, palette="viridis",
             edgecolor="black", linewidth=0.5
         )
         ax1.set_title(f"{column} Dağılımı", pad=15)
-        
+
         # Boxplot
         sns.boxplot(
             data=self.df, y=column, ax=ax2,
@@ -80,38 +80,57 @@ class BostonVisualizer:
             showfliers=True
         )
         ax2.set_title("Boxplot", pad=15)
-        
+
         plt.tight_layout()
         self._save_plot(fig, save_path)
 
     # 4. Scatter Plot (Geliştirilmiş)
-    def plot_scatter(self, x_col: str, y_col: str, 
-                   save_path: Optional[str] = None,
-                   hue: Optional[str] = None, 
-                   size: Optional[str] = None,
-                   trendline: bool = True) -> None:
+    def plot_scatter(self, x_col: str, y_col: str,
+               save_path: Optional[str] = None,
+               hue: Optional[str] = None,
+               size: Optional[str] = None,
+               trendline: bool = True) -> None:
         """Regresyon çizgili ve boyutlandırmalı scatter plot"""
-        plt.figure(figsize=(10, 8))
-        scatter = sns.lmplot(
-            data=self.df,
-            x=x_col, y=y_col,
-            hue=hue, size=size,
-            palette="Set2",
-            height=8, aspect=1.2,
-            scatter_kws={"alpha": 0.7, "edgecolor": "black"},
-            line_kws={"color": "red", "linestyle": "--"}
-        )
-        plt.title(f"{x_col} vs {y_col} İlişkisi", pad=20)
-        if trendline:
-            sns.regplot(
-                data=self.df, x=x_col, y=y_col, 
-                scatter=False, ci=95,
-                line_kws={"color": "darkred", "linewidth": 2}
+        try:
+            # 1. Figure oluşturma
+            plt.figure(figsize=(10, 8))
+
+            # 2. Ana scatter plot
+            scatter = sns.scatterplot(
+                data=self.df,
+                x=x_col, y=y_col,
+                hue=hue, size=size,
+                palette="Set2",
+                alpha=0.7,
+                edgecolor="black"
             )
-        self._save_plot(scatter.figure, save_path)
+
+            # 3. Trendline ekleme
+            if trendline:
+                sns.regplot(
+                    data=self.df, x=x_col, y=y_col,
+                    scatter=False, ci=95,
+                    line_kws={"color": "darkred", "linewidth": 2, "linestyle": "--"}
+                )
+
+            plt.title(f"{x_col} vs {y_col} İlişkisi", pad=20)
+
+            # 4. Legend ayarı
+            if hue is not None:
+                plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+
+            # 5. Kaydetme
+            if save_path:
+                self._save_plot(plt.gcf(), save_path)  # gcf() = get current figure
+            else:
+                plt.show()
+
+        except Exception as e:
+            print(f"Hata oluştu: {str(e)}")
+            raise
 
     # 5. Çoklu Pairplot (Geliştirilmiş)
-    def plot_pairplot(self, columns: List[str], 
+    def plot_pairplot(self, columns: List[str],
                      save_path: Optional[str] = None,
                      diag_kind: str = "kde") -> None:
         """Özelleştirilmiş pairplot"""
@@ -126,7 +145,7 @@ class BostonVisualizer:
         self._save_plot(pairplot.figure, save_path)
 
     # 6. Interaktif Plotly Grafiği
-    def plot_interactive_scatter(self, x_col: str, y_col: str, 
+    def plot_interactive_scatter(self, x_col: str, y_col: str,
                               color_col: Optional[str] = None,
                               output_path: str = "interactive_plot.html"):
         """HTML olarak kaydedilebilen interaktif grafik"""
