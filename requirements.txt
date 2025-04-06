@@ -1,0 +1,22 @@
+# 📦 Temel Bağımlılıklar
+pandas>=2.0.3
+numpy>=1.24.3
+scikit-learn>=1.3.0
+matplotlib>=3.7.1
+seaborn>=0.12.2
+plotly>=5.15.0
+jupyter>=1.0.0
+
+# 🛠 Geliştirme Araçları
+pytest>=7.4.0
+pytest-cov>=4.1.0
+black>=23.7.0
+flake8>=6.0.0
+mypy>=1.5.0
+
+# 📊 İsteğe Bağlı Görselleştirme
+ipywidgets>=8.0.6  # Jupyter interaktif widget'ları için
+notebook>=6.5.4    # Jupyter notebook desteği
+
+# 🐍 Python Sürümü
+python>=3.9,<3.12
