@@ -160,9 +160,16 @@ class BostonVisualizer:
 
     # Yardımcı Fonksiyon
     def _save_plot(self, fig, save_path: Optional[str] = None):
-        """Grafiği kaydetme veya gösterme"""
-        if save_path:
-            fig.savefig(save_path, bbox_inches='tight', dpi=300)
+        """Güvenli kayıt fonksiyonu"""
+        try:
+            if save_path:
+                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+                fig.savefig(save_path, bbox_inches='tight', dpi=300)
+                plt.close(fig)
+                print(f"Grafik kaydedildi: {save_path}")
+            else:
+                plt.show()
+        except Exception as e:
+            print(f"Kayıt hatası: {str(e)}")
             plt.close()
-        else:
-            plt.show()
+            raise

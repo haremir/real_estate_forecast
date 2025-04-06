@@ -2,12 +2,13 @@
 import pytest
 import pandas as pd
 import os
+
 """
 BU KOD KISMI DOSYA BULAMAMA PROBLEMİNİ ÇÖZÜYOR
 """
 #-----------------------------------------
 
-os.chdir(r"C:\Users\emirh\Desktop\acunmedya\mart3")  # Ana proje dizinine geç
+os.chdir(r"C:\Users\emirh\Desktop\mart3")  # Ana proje dizinine geç
 print(os.getcwd())  # Doğru olduğuna emin ol
 sys.path.append(os.getcwd())
 sys.path.append(os.path.abspath(os.path.join('..', 'src')))  # src klasörünü ekle
