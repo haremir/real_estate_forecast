@@ -37,15 +37,34 @@ Bu projede, Boston konut veri seti üzerinde makine öğrenimi için veri temizl
 - Plotly ile interaktif görselleştirmelerin raporlama avantajları
 
 ## 📌 Sonraki Adımlar
-- [ ] `cleaner.py`'a loglama mekanizması eklenmesi
-- [ ] Görselleştirmelerin `visualizer.py` modülünden otomatik üretilmesi
-- [ ] Otomatik test kapsamının genişletilmesi
+- [x] `cleaner.py`'a loglama mekanizması eklenmesi
+- [x] Görselleştirmelerin `visualizer.py` modülünden otomatik üretilmesi
+- [x] Otomatik test kapsamının genişletilmesi
+- [x] Raporlama eklenecek
+- [ ] Raporlama modüler hale getirilecek
 - [ ] Makine Öğrenmesi Algoritmaları eklenmesi
 - [ ] Streamlit ile interaktif dashboard entegrasyonu
 
-> ⚠ Bu proje şu an **Versiyon 1.0.0** olarak tamamlanmıştır. Geliştirmeler devam edecektir.
-
+## ✅ Tamamlananlar
+- `cleaner.py`'a loglama mekanizması eklendi
+- `visualizer.py` modülünden görselleştirmeler otomatik üretiliyor
+- Otomatik test kapsamı genişletildi
+- Raporlama yapıldı PDF formatında raporlamalar yapılıyor
 ---
+
+> ⚠  Bu proje şu an **Versiyon 1.1.0** sürümündedir. Ana işlevler kararlı ve kullanılabilir durumdadır. Yeni özellikler ve iyileştirmelerle geliştirme süreci devam etmektedir.
+
+## 📝 Sürüm Notları
+
+### v1.1.0
+- `cleaner.py` için loglama mekanizması eklendi
+- `visualizer.py` üzerinden görselleştirme otomatik hale getirildi
+- Otomatik test kapsamı genişletildi
+- Raporlama eklendi
+
+### v1.0.0
+- Proje temel işlevselliği tamamlandı ve ilk stabil sürüm yayınlandı
+
 
 ## 🛠 Kurulum & Çalıştırma
 ```bash
