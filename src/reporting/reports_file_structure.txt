@@ -1,0 +1,18 @@
+# reporting/
+# ├── __init__.py
+# ├── core.py
+# ├── report_generator.py
+# ├── generator_report.py
+# ├── utils.py
+# ├── templates/
+# │   ├── __init__.py
+# │   ├── base_template.py
+# │   ├── data_analysis_template.py
+# │   └── custom_template.py
+# └── components/
+#     ├── __init__.py
+#     ├── cover_page.py
+#     ├── table_of_contents.py
+#     ├── data_summary.py
+#     ├── visualizations.py
+#     └── text_sections.py
