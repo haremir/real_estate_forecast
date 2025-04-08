@@ -2,10 +2,9 @@
 """
 Boston Housing - Modüler Rapor Üretici
 Kullanım:
-  python generate_report.py [--input <path>] [--output <path>] [--visuals-dir <path>]
+  python generate_report.py [--input <path>] [--output <path>] [--visuals-dir <path>] [--logo <path>]
 """
 
-# generate_report.py dosyasında, import kısmında güncelleme yapın
 import os
 import sys
 import argparse
@@ -29,6 +28,7 @@ VISUALIZATIONS_DIR = os.path.join(PROJECT_ROOT, "src", "visualizations")
 DEFAULT_OUTPUT = os.path.join(
     PROJECT_ROOT, "reports", f"boston_analysis_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
 )
+DEFAULT_LOGO = os.path.join(PROJECT_ROOT, "src", "assets", r"C:\Users\PC\Desktop\real_estate_forecast\src\reporting\assets\harezmi_intelligence.PNG")
 
 # Görsel açıklamaları - İsteğe bağlı görsel açıklamaları ekleyebilirsiniz
 VISUALIZATION_DESCRIPTIONS = {
@@ -42,7 +42,16 @@ VISUALIZATION_DESCRIPTIONS = {
     "scorrelation_matrix.png": "Tüm değişkenler arasındaki korelasyon katsayılarını gösteren matris."
 }
 
-def generate_report(input_path, output_path, visuals_dir):
+# Rapor bulgularını tanımla
+REPORT_FINDINGS = [
+    "Boston konut fiyatları (MEDV) ile oda sayısı (RM) arasında güçlü pozitif korelasyon bulunmaktadır.",
+    "Düşük gelirli bölgelerde (LSTAT yüksek) konut fiyatları (MEDV) önemli ölçüde düşmektedir.",
+    "Bölgedeki suç oranı (CRIM) arttıkça konut fiyatları düşmektedir.",
+    "Charles Nehri'ne yakınlık (CHAS=1), konut fiyatlarında ortalama 5 birimlik bir artışa karşılık gelmektedir.",
+    "Veri seti özelliklerinin çoğu normal dağılım göstermemekte, sağa çarpık dağılımlar görülmektedir."
+]
+
+def generate_report(input_path, output_path, visuals_dir, logo_path=None):
     """
     Modüler rapor sistemini kullanarak Boston Housing verisi için rapor üretir
 
@@ -50,6 +59,7 @@ def generate_report(input_path, output_path, visuals_dir):
         input_path (str): Girdi CSV dosyasının yolu
         output_path (str): Çıktı PDF dosyasının yolu
         visuals_dir (str): Görselleştirmeler klasörünün yolu
+        logo_path (str): Logo dosyasının yolu
 
     Returns:
         bool: Başarılı ise True, değilse False
@@ -70,6 +80,11 @@ def generate_report(input_path, output_path, visuals_dir):
         if visuals_dir and not os.path.exists(visuals_dir):
             print(f"⚠️ Uyarı: Görselleştirmeler klasörü bulunamadı: {visuals_dir}")
             visuals_dir = None
+            
+        # Logo dosyasını kontrol et
+        if logo_path and not os.path.exists(logo_path):
+            print(f"⚠️ Uyarı: Logo dosyası bulunamadı: {logo_path}")
+            logo_path = None
         
         # Veriyi yükle
         df = pd.read_csv(input_path)
@@ -79,8 +94,11 @@ def generate_report(input_path, output_path, visuals_dir):
         template = DataAnalysisReport(
             df=df,
             title="BOSTON KONUT ANALİZ RAPORU",
-            author="Veri Bilimi Ekibi",
-            visuals_directory=visuals_dir
+            author="HAREZMİ INTELLIGENCE",
+            visuals_directory=visuals_dir,
+            logo_path=logo_path,
+            add_comments=True,
+            findings=REPORT_FINDINGS
         )
         
         # ImageGallery bileşenine açıklamaları ekle (eğer visuals_dir varsa)
@@ -94,7 +112,14 @@ def generate_report(input_path, output_path, visuals_dir):
         generator = ReportGenerator(
             template=template,
             output_path=output_path,
-            style='ggplot'
+            style='ggplot',
+            config={
+                'figure.figsize': (11, 8),
+                'font.size': 10,
+                'axes.titlesize': 14,
+                'axes.labelsize': 12,
+                'font.family': 'sans-serif'
+            }
         )
         
         result = generator.generate()
@@ -118,16 +143,20 @@ if __name__ == "__main__":
                        help=f"Çıktı PDF dosya yolu (varsayılan: {DEFAULT_OUTPUT})")
     parser.add_argument("--visuals-dir", default=VISUALIZATIONS_DIR,
                        help=f"Görselleştirmeler klasörü (varsayılan: {VISUALIZATIONS_DIR})")
+    parser.add_argument("--logo", default=DEFAULT_LOGO,
+                       help=f"Logo dosyası (varsayılan: {DEFAULT_LOGO})")
     args = parser.parse_args()
     
     # Yolları normalize et
     input_path = os.path.abspath(os.path.normpath(args.input))
     output_path = os.path.abspath(os.path.normpath(args.output))
     visuals_dir = os.path.abspath(os.path.normpath(args.visuals_dir)) if args.visuals_dir else None
+    logo_path = os.path.abspath(os.path.normpath(args.logo)) if args.logo else None
     
     # Bilgileri görüntüle
     print(f"Girdi dosyası: {input_path}")
     print(f"Çıktı dosyası: {output_path}")
     print(f"Görselleştirmeler klasörü: {visuals_dir}")
+    print(f"Logo dosyası: {logo_path}")
     
-    sys.exit(0 if generate_report(input_path, output_path, visuals_dir) else 1)
+    sys.exit(0 if generate_report(input_path, output_path, visuals_dir, logo_path) else 1)

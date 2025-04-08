@@ -9,6 +9,8 @@ from matplotlib.backends.backend_pdf import PdfPages
 from datetime import datetime
 from abc import ABC, abstractmethod
 
+# core.py içinde PdfReport sınıfı güncelleniyor
+
 class PdfReport:
     """
     PDF raporu oluşturmak için temel sınıf.
@@ -30,6 +32,7 @@ class PdfReport:
         }
         self.config = config if config else self.default_config
         self.initialize_style()
+        self.page_numbers = True  # Sayfa numarası eklemek için bayrak
         
     def initialize_style(self):
         """Görsel stilini başlatır"""
@@ -54,8 +57,16 @@ class PdfReport:
             print(f"ℹ Bilgi: Çıktı klasörü oluşturuldu: {output_dir}")
             
         with PdfPages(self.output_path) as pdf:
-            for component in components:
+            total_pages = len(components)
+            for i, component in enumerate(components):
+                # Bileşeni render et
                 component.render(pdf)
+                
+                # Sayfa numarası ekle (Son sayfalar hariç - örneğin kapak ve içindekiler)
+                if self.page_numbers and i >= 2:  # İlk iki sayfaya sayfa numarası koymuyoruz (kapak ve içindekiler)
+                    fig = plt.figure(figsize=(8.5, 11))
+                    plt.figtext(0.5, 0.02, f"{i-1}/{total_pages-2}", ha='center', fontsize=8)
+                    plt.close()
                 
         print(f"✓ Rapor başarıyla oluşturuldu:\n{os.path.abspath(self.output_path)}")
         return True

@@ -9,18 +9,22 @@ import os
 from ..core import ReportComponent
 from ..utils import get_image_files, load_image
 
+# visualizations.py içindeki CommentedGraph sınıfını kullanıma hazır hale getirelim
+
 class CorrelationMatrix(ReportComponent):
     """
     Korelasyon matrisi rapor bileşeni
     """
-    def __init__(self, df, title="KORELASYON ANALİZİ"):
+    def __init__(self, df, title="KORELASYON ANALİZİ", add_comments=True):
         """
         Args:
             df (pd.DataFrame): Korelasyon hesaplanacak veri çerçevesi
             title (str): Başlık
+            add_comments (bool): Otomatik yorum eklensin mi?
         """
         super().__init__(title, figsize=(11, 8))
         self.df = df
+        self.add_comments = add_comments
         
     def render(self, pdf):
         """
@@ -29,7 +33,13 @@ class CorrelationMatrix(ReportComponent):
         Args:
             pdf (PdfPages): PDF sayfaları
         """
-        plt.figure(figsize=self.figsize)
+        fig = plt.figure(figsize=self.figsize)
+        
+        # Grafiği çizmek için alt figür alanı oluştur
+        if self.add_comments:
+            plot_area = plt.subplot2grid((5, 1), (0, 0), rowspan=4)
+        else:
+            plot_area = plt.subplot(111)
         
         # Başlık
         plt.suptitle(self.title, fontsize=16, y=0.98)
@@ -38,9 +48,29 @@ class CorrelationMatrix(ReportComponent):
         corr = self.df.corr(numeric_only=True)
         mask = np.triu(np.ones_like(corr, dtype=bool))
         sns.heatmap(corr, mask=mask, annot=True, fmt=".2f", cmap="coolwarm",
-                   cbar_kws={"shrink": 0.8}, annot_kws={"size": 8})
+                   cbar_kws={"shrink": 0.8}, annot_kws={"size": 8}, ax=plot_area)
         
-        plt.tight_layout()
+        # Otomatik yorum ekle
+        if self.add_comments:
+            comment_area = plt.subplot2grid((5, 1), (4, 0))
+            comment_area.axis('off')
+            
+            # En yüksek korelasyonları bul
+            corr_no_diag = corr.copy()
+            np.fill_diagonal(corr_no_diag.values, 0)
+            max_corr = corr_no_diag.abs().unstack().sort_values(ascending=False)[:3]
+            
+            comment = f"En yüksek korelasyonlar: "
+            for (col1, col2), val in max_corr.items():
+                comment += f"{col1}-{col2} ({val:.2f}), "
+            comment = comment[:-2]  # Son virgülü kaldır
+            
+            comment_area.text(0.02, 0.5, f"📊 Yorum: {comment}", 
+                         wrap=True, va='center', ha='left',
+                         fontsize=10, bbox=dict(facecolor='#f8f9fa', 
+                                              alpha=0.8, boxstyle='round,pad=0.5'))
+        
+        plt.tight_layout(rect=[0, 0, 1, 0.95])
         pdf.savefig(bbox_inches='tight')
         plt.close()
 
@@ -148,3 +178,4 @@ class ImageGallery(ReportComponent):
                 print(f"⚠️ Uyarı: {img_path} dosyası yüklenemedi: {str(e)}")
                 
             plt.close()
+

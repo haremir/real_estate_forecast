@@ -4,6 +4,10 @@
 # ├── report_generator.py
 # ├── generator_report.py
 # ├── utils.py
+# ├── config/
+# │   ├── theme.yaml
+# ├── assets/
+# │   ├── harezmi_intelligence.PNG
 # ├── templates/
 # │   ├── __init__.py
 # │   ├── base_template.py
